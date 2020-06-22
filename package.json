@@ -1,0 +1,31 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.7.4",
+    "connect-multiparty": "^2.2.0",
+    "email-validator": "^2.0.4",
+    "express": "^4.17.1",
+    "helmet": "^3.23.1",
+    "mongoose": "^5.9.19",
+    "mongoose-beautiful-unique-validation": "^7.1.1",
+    "validator": "^13.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/mckayneCok/eventcobackend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/mckayneCok/eventcobackend/issues"
+  },
+  "homepage": "https://gitlab.com/mckayneCok/eventcobackend#readme"
+}
