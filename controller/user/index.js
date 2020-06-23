@@ -2,10 +2,13 @@ const express = require('express');
 const user = new express.Router();
 var validator = require("email-validator");
 const User = require('./model/userModel')
-const Otp = require('./model/otpModel');
-const {
-  exit
-} = require('process');
+const Otp = require('../commonModels/otpModel');
+const {  exit} = require('process');
+
+//user redirections////
+user.use('/slider', require('./slider'));
+// user.use('/vendorList', require('./list'));
+
 /*** User Data***/
 user.get('/', async function (req, res) {
   let data = await getAll();
@@ -66,7 +69,7 @@ user.post('/register', async (req, res) => {
   if (email) {
     responseSend(res, 409, {
       status: 409,
-      message: 'This email already exist!'
+      message: 'This Email already exist!'
     });
     return
   } else if (!validator.validate(req.body.email)) {
@@ -79,7 +82,7 @@ user.post('/register', async (req, res) => {
   if (mobileNo) {
     responseSend(res, 405, {
       status: 405,
-      message: 'This mobile number already exist!'
+      message: 'This Mobile Number Already Exist!'
     });
     return
   }
@@ -96,25 +99,22 @@ user.post('/register', async (req, res) => {
       let errorMsg = '';
       if (error.errors.mobileNo) {
         errorMsg = error.errors.mobileNo.message;
-        // console.log(errorMsg)
-        statusCode = 402
       }
       if (error.errors.email) {
-        errorMsg = error.errors.email.message
-        console.log(error.errors)
+        errorMsg = error.errors.email.message;
       }
-      responseSend(res, statusCode, {
-        status: statusCode,
+      responseSend(res, 402, {
+        status: 402,
         message: errorMsg
       })
     } else {
       let userData = {
-        status: 'success',
-        statusCode: 200,
+        message: 'success',
+        status: 200,
         userId: user.userId,
         mobileNo: user.mobileNo,
         name: user.name,
-        imgPath: user.imgPath.file_name ? user.imgPath : '',
+        imgPath: user.imgPath ? user.imgPath : '',
       };
       responseSend(res, 200, userData)
     }
@@ -135,7 +135,7 @@ user.post('/otpRegister', async (req, res) => {
   if (email) {
     responseSend(res, 409, {
       status: 409,
-      message: 'This email already exist!'
+      message: 'This Email Already Exist!'
     });
     return
   } else if (!validator.validate(req.body.email)) {
@@ -148,7 +148,7 @@ user.post('/otpRegister', async (req, res) => {
   if (mobileNo) {
     responseSend(res, 405, {
       status: 405,
-      message: 'This mobile number already exist!'
+      message: 'This Mobile Number Already Exist!'
     });
     return
   }
@@ -190,6 +190,8 @@ user.post('/otpForgot', async (req, res) => {
       message: 'Mobile Number Not Exists'
     });
   else {
+
+
     Otp.deleteOne({
       mobileNo: req.body.mobileNo
     }, (err, user) => {
@@ -259,7 +261,7 @@ user.post('/forgotPassword', async (req, res) => {
   if (!error)
     responseSend(res, 401, {
       status: 401,
-      message: 'MobileNo Not Found'
+      message: 'Mobile Number Not Found'
     })
   else
     User.updateOne({
@@ -267,15 +269,33 @@ user.post('/forgotPassword', async (req, res) => {
     }, {
       $set: req.body
     }, async (err, user) => {
-      (err || !user || user === undefined) ?
-      responseSend(res, 304, {
+      if (err || !user || user === undefined) {
+        responseSend(res, 304, {
           status: 304,
           message: 'not updated'
-        }):
-        responseSend(res, 200, {
+        });
+        return
+      }
+      User.findOne({
+        mobileNo: req.body.mobileNo
+      }, async (err, data) => {
+        if (err) {
+          responseSend(res, 500, {
+            status: 500,
+            message: "Oops Something Went Wrong!"
+          });
+          return
+        }
+        let userData = {
+          message: 'Successfully Updated',
           status: 200,
-          message: 'success'
-        })
+          userId: data.userId,
+          mobileNo: data.mobileNo,
+          name: data.name,
+          imgPath: data.imgPath.file_name ? data.imgPath : '',
+        };
+        responseSend(res, 200, userData)
+      })
     })
 })
 /*** Uploading Img***/
@@ -340,17 +360,14 @@ getRandomOtp = async (res, mobileNo) => {
       message: user.otp
     })
   });
-  console.log("OTP-------", userOtp)
 }
 /*** OTP generation***/
 generateOTP = () => {
   min = Math.ceil(1111);
   max = Math.floor(9999);
   get = Math.floor(Math.random() * (max - min)) + min;
-  return get
+  return get;
 }
-
-
 /*** Updating Last Activity***/
 lastActivityUpdate = async (userId) => {
   User.updateOne({
@@ -364,12 +381,10 @@ lastActivityUpdate = async (userId) => {
     console.log(err, 'failed to update Recent Active Time'):
       console.log("Updated Recent Time")
   })
-
 }
 /*** common response***/
 function responseSend(res, statusCode, message) {
   res.status(statusCode)
     .send(message);
 }
-
 module.exports = user;
