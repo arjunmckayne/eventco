@@ -3,11 +3,10 @@ const user = new express.Router();
 var validator = require("email-validator");
 const User = require('./model/userModel')
 const Otp = require('../commonModels/otpModel');
-const {  exit} = require('process');
 
 //user redirections////
 user.use('/slider', require('./slider'));
-// user.use('/vendorList', require('./list'));
+user.use('/vendorList', require('./vendorList'));
 
 /*** User Data***/
 user.get('/', async function (req, res) {
@@ -29,7 +28,7 @@ user.post('/login', async (req, res) => {
       mobileNo: req.body.mobileNo
     }, function (err, user) {
       if (err)
-        responseSend(res, 500, err)
+        responseSend(res, 500, "Oops Something went wrong!")
       else(!user) ?
         responseSend(res, 400, {
           status: 400,
@@ -43,7 +42,7 @@ user.post('/login', async (req, res) => {
               userId: user.userId,
               mobileNo: user.mobileNo,
               name: user.name,
-              imgPath: user.imgPath.path ? user.imgPath.path : ''
+              imgPath: user.imgPath ? user.imgPath : ''
             };
             responseSend(res, 200, userData);
             lastActivityUpdate(userData.userId);
@@ -94,6 +93,8 @@ user.post('/register', async (req, res) => {
     email: req.body.email,
     createdDate: new Date()
   });
+  
+
   user.save(function (error, user) {
     if (error) {
       let errorMsg = '';
@@ -103,6 +104,7 @@ user.post('/register', async (req, res) => {
       if (error.errors.email) {
         errorMsg = error.errors.email.message;
       }
+      console.log('------------ ',error)
       responseSend(res, 402, {
         status: 402,
         message: errorMsg
@@ -320,9 +322,16 @@ getId = async () => {
     createdDate: -1
   }).limit(1);
   if (val)
-    return val["userId"] != null || val != NaN ? val["userId"] + 1 : 1;
+    return val.userId != null || val.userId != NaN ?
+      "u" + (parseInt(val.userId.split("u")[1]) + 1) :
+      "u1"
+  // return val["userId"] != null || val != NaN ?
+  //   "u" + (parseInt(val["userId"]).split("u")[1] + 1) : "u1";
   else
-    return 1;
+    {
+  console.log("Got called")
+
+      return "u1";}
 }
 /*** Getting All UserDetails***/
 getAll = async () => {

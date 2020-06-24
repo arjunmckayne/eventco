@@ -3,6 +3,6 @@ const apis = new express.Router();
 
 apis.use('/v1/user', require('./user/index'))
 apis.use('/v1/admin', require('./admin/index'))
-// apis.use('/v1/vendor', require('./vendor/vendor'));
+apis.use('/v1/vendor', require('./vendor/index'));
 
 module.exports = apis;

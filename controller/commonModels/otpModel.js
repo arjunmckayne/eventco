@@ -7,9 +7,6 @@ const otpSchema = new mongoose.Schema({
     },
     otp:{
         type: Number, require: true
-    },
-    type:{
-        type:String, require:true
     }
 })
 otpSchema.pre('save', async function (next) {

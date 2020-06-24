@@ -1,7 +1,7 @@
 const express = require('express');
 const slider = new express.Router();
 const multipart = require('connect-multiparty');
-const multipartMiddlewareVideo = multipart({
+const upload = multipart({
     uploadDir: './public/img/Slider'
 });
 const Slider = require('./../commonModels/sliderModel')
@@ -14,25 +14,22 @@ slider.get('/', async function (req, res) {
         .send(data);
 });
 
-slider.post("/create", multipartMiddlewareVideo, async (req, res) => {
-    console.log(req.files.file)
+slider.post("/create", upload, async (req, res) => {
+    console.log(req.files.sliderImg)
     if (req.body.caption === null || req.body.caption === '' || !req.files) {
         responseSend(res, 401, 'Pass the data');
         return
     }
     let slider = new Slider({
-        caption: req.body.caption,
-        file_name: req.files.file.originalFilename,
-        size: req.files.file.size,
-        type: req.files.file.type,
-        path: req.files.file.path
+        sliderName: req.body.caption,
+        path: req.files.sliderImg.path
     });
     slider.save((error, data) => {
         if (error) {
             responseSend(res, 500, error);
             return
         }
-        responseSend(res, 200, "Successfully Uploaded the Video");
+        responseSend(res, 200, "Successfully Uploaded the Slider");
     });
 });
 

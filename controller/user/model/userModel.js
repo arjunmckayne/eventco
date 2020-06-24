@@ -10,9 +10,9 @@ const userSchema = new mongoose.Schema({
         min: 5
     },
     userId: {
-        type: Number,
+        type: String,
         require: true,
-        default: 1,
+        default: 'u1',
     },
     password: {
         type: String,
