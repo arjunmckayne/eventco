@@ -5,7 +5,7 @@ mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
 var ip = require("ip");
-const url = "mongodb://" + ip.address() + ":27017/eventco";
+const url = "mongodb://" + ip.address() + "/eventco";
 console.log("url--------------------", url);
 mongoose.connect(url, (error) => {
   error

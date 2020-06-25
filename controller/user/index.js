@@ -18,12 +18,7 @@ user.get('/', async function (req, res) {
 });
 /*** User Login***/
 user.post('/login', async (req, res) => {
-  if (req.body.mobileNo === '' || req.body.mobileNo == null || req.body.password === null || req.body.password == '')
-    responseSend(res, 500, {
-      status: 500,
-      message: "Oops Something went wrong!"
-    });
-  else
+  try {
     User.findOne({
       mobileNo: req.body.mobileNo
     }, function (err, user) {
@@ -53,119 +48,125 @@ user.post('/login', async (req, res) => {
             });
         });
     });
-})
+  } catch (err) {
+    res.status(500)
+      .send({
+        status: 500,
+        message: "Oops Something went wrong!"
+      })
+  }
+});
 /*** User Register***/
 user.post('/register', async (req, res) => {
-  if (req.body.name == '' || req.body.name == null || req.body.email == null || req.body.mobileNo == null || req.body.password == '') {
-    responseSend(res, 500, {
-      status: 500,
-      message: "Oops Something went wrong!"
-    });
-    return
-  }
-  let email = await getUserDetails('email', req.body.email);
-  let mobileNo = await getUserDetails("mobileNo", req.body.mobileNo);
-  if (email) {
-    responseSend(res, 409, {
-      status: 409,
-      message: 'This Email already exist!'
-    });
-    return
-  } else if (!validator.validate(req.body.email)) {
-    responseSend(res, 422, {
-      status: 422,
-      message: 'Invalid Email Entry'
-    })
-    return
-  }
-  if (mobileNo) {
-    responseSend(res, 405, {
-      status: 405,
-      message: 'This Mobile Number Already Exist!'
-    });
-    return
-  }
-  let user = new User({
-    userId: await getId(),
-    name: req.body.name,
-    password: req.body.password,
-    mobileNo: req.body.mobileNo,
-    email: req.body.email,
-    createdDate: new Date()
-  });
-  
-
-  user.save(function (error, user) {
-    if (error) {
-      let errorMsg = '';
-      if (error.errors.mobileNo) {
-        errorMsg = error.errors.mobileNo.message;
-      }
-      if (error.errors.email) {
-        errorMsg = error.errors.email.message;
-      }
-      console.log('------------ ',error)
-      responseSend(res, 402, {
-        status: 402,
-        message: errorMsg
+  try {
+    let email = await getUserDetails('email', req.body.email);
+    let mobileNo = await getUserDetails("mobileNo", req.body.mobileNo);
+    if (email) {
+      responseSend(res, 409, {
+        status: 409,
+        message: 'This Email already exist!'
+      });
+      return
+    } else if (!validator.validate(req.body.email)) {
+      responseSend(res, 422, {
+        status: 422,
+        message: 'Invalid Email Entry'
       })
-    } else {
-      let userData = {
-        message: 'success',
-        status: 200,
-        userId: user.userId,
-        mobileNo: user.mobileNo,
-        name: user.name,
-        imgPath: user.imgPath ? user.imgPath : '',
-      };
-      responseSend(res, 200, userData)
+      return
     }
-  });
+    if (mobileNo) {
+      responseSend(res, 405, {
+        status: 405,
+        message: 'This Mobile Number Already Exist!'
+      });
+      return
+    }
+    let user = new User({
+      userId: await getId(),
+      name: req.body.name,
+      password: req.body.password,
+      mobileNo: req.body.mobileNo,
+      email: req.body.email,
+      createdDate: new Date()
+    });
+
+
+    user.save(function (error, user) {
+      if (error) {
+        let errorMsg = '';
+        if (error.errors.mobileNo) {
+          errorMsg = error.errors.mobileNo.message;
+        }
+        if (error.errors.email) {
+          errorMsg = error.errors.email.message;
+        }
+        responseSend(res, 402, {
+          status: 402,
+          message: errorMsg
+        })
+      } else {
+        let userData = {
+          message: 'success',
+          status: 200,
+          userId: user.userId,
+          mobileNo: user.mobileNo,
+          name: user.name,
+          imgPath: user.imgPath ? user.imgPath : '',
+        };
+        responseSend(res, 200, userData)
+      }
+    });
+  } catch (err) {
+    res.status(500)
+      .send({
+        status: 500,
+        message: "Oops Something went wrong!"
+      })
+  }
+
+
 });
 
 /*** otpRegister***/
 user.post('/otpRegister', async (req, res) => {
-  if (req.body.mobileNo === null || req.body.mobileNo == '' || req.body.mobileNo == undefined || req.body.email == '' || req.body.email == null) {
+  try {
+    let email = await getUserDetails('email', req.body.email);
+    let mobileNo = await getUserDetails("mobileNo", req.body.mobileNo);
+    if (email) {
+      responseSend(res, 409, {
+        status: 409,
+        message: 'This Email Already Exist!'
+      });
+      return
+    } else if (!validator.validate(req.body.email)) {
+      responseSend(res, 422, {
+        status: 422,
+        message: 'Invalid Email Entry'
+      })
+      return
+    }
+    if (mobileNo) {
+      responseSend(res, 405, {
+        status: 405,
+        message: 'This Mobile Number Already Exist!'
+      });
+      return
+    }
+    getRandomOtp(res, req.body.mobileNo);
+  } catch (err) {
     responseSend(res, 500, {
       status: 500,
       message: "Oops Something went wrong!"
     });
-    return
   }
-  let email = await getUserDetails('email', req.body.email);
-  let mobileNo = await getUserDetails("mobileNo", req.body.mobileNo);
-  if (email) {
-    responseSend(res, 409, {
-      status: 409,
-      message: 'This Email Already Exist!'
-    });
-    return
-  } else if (!validator.validate(req.body.email)) {
-    responseSend(res, 422, {
-      status: 422,
-      message: 'Invalid Email Entry'
-    })
-    return
-  }
-  if (mobileNo) {
-    responseSend(res, 405, {
-      status: 405,
-      message: 'This Mobile Number Already Exist!'
-    });
-    return
-  }
-  getRandomOtp(res, req.body.mobileNo);
+
 });
 /*** otpResend***/
 
 user.post('/otpResend', async (req, res) => {
-  if (req.body.mobileNo == null || req.body.mobileNo == '') {
-    responseSend(res, 500, {
-      status: 500,
-      message: "Oops Something went wrong!"
-    });
-    return
-  } else {
+  try {
+    if (req.body.mobileNo === '')
+      throw "Null Value"
     Otp.deleteOne({
       mobileNo: req.body.mobileNo
     }, (err, user) => {
@@ -175,144 +176,142 @@ user.post('/otpResend', async (req, res) => {
         console.log(req.body.mobileNo, "User Deleted")
     })
     getRandomOtp(res, req.body.mobileNo);
+  } catch (err) {
+    responseSend(res, 500, {
+      status: 500,
+      message: "Oops Something went wrong!"
+    });
   }
-})
+});
 user.post('/otpForgot', async (req, res) => {
-  if (req.body.mobileNo == null || req.body.mobileNo == '') {
-    responseSend(res, 500, {
-      status: 500,
-      message: "Oops Something went wrong!"
-    });
-    return
-  }
-  let mobileNo = await getUserDetails("mobileNo", req.body.mobileNo);
-  if (!mobileNo)
-    responseSend(res, 409, {
-      status: 409,
-      message: 'Mobile Number Not Exists'
-    });
-  else {
-
-
-    Otp.deleteOne({
-      mobileNo: req.body.mobileNo
-    }, (err, user) => {
-      if (err)
-        console.log("Errr", err)
-      else
-        console.log(mobileNo, "User Deleted")
-    })
-    getRandomOtp(res, req.body.mobileNo);
-  }
-})
-user.post('/verifyOtp', async (req, res) => {
-  if (req.body.mobileNo == null || req.body.mobileNo == '' || req.body.otp == '' || req.body.otp == null) {
-    responseSend(res, 500, {
-      status: 500,
-      message: "Oops Something went wrong!"
-    });
-    return
-  }
-  console.log(req.body.otp)
-  Otp.find({
-    mobileNo: req.body.mobileNo,
-    otp: req.body.otp,
-    type: "user"
-  }, (err, data) => {
-    if (err) {
-      responseSend(403, {
-        status: 403,
-        message: 'OTP Not Match'
+  try {
+    let mobileNo = await getUserDetails("mobileNo", req.body.mobileNo);
+    if (!mobileNo)
+      responseSend(res, 409, {
+        status: 409,
+        message: 'Mobile Number Not Exists'
       });
-      return
-    }
-    console.log(data)
-    if (data[0]) {
-      responseSend(res, 200, {
-        status: 200,
-        message: "OTP verified Successfully"
-      })
+    else {
+
+
       Otp.deleteOne({
         mobileNo: req.body.mobileNo
       }, (err, user) => {
         if (err)
           console.log("Errr", err)
-        else if (data[0])
-          console.log(data[0]._id, "User Deleted")
-      });
-      return;
-    } else {
-      responseSend(res, 422, {
-        status: 422,
-        message: "OTP Not Valid"
+        else
+          console.log(mobileNo, "User Deleted")
       })
-
+      getRandomOtp(res, req.body.mobileNo);
     }
-  })
-})
-/*** forgot Password ***/
-user.post('/forgotPassword', async (req, res) => {
-  if (req.body.mobileNo == '' || req.body.mobileNo == null || req.body.password == '' || req.body.password == null) {
+  } catch (err) {
     responseSend(res, 500, {
       status: 500,
       message: "Oops Something went wrong!"
     });
-    return
   }
-  let error = await getUserDetails('mobileNo', req.body.mobileNo);
-  if (!error)
-    responseSend(res, 401, {
-      status: 401,
-      message: 'Mobile Number Not Found'
-    })
-  else
-    User.updateOne({
-      mobileNo: req.body.mobileNo
-    }, {
-      $set: req.body
-    }, async (err, user) => {
-      if (err || !user || user === undefined) {
-        responseSend(res, 304, {
-          status: 304,
-          message: 'not updated'
+});
+user.post('/verifyOtp', async (req, res) => {
+  try {
+    Otp.find({
+      mobileNo: req.body.mobileNo,
+      otp: req.body.otp,
+      type: "user"
+    }, (err, data) => {
+      if (err) {
+        responseSend(403, {
+          status: 403,
+          message: 'OTP Not Match'
         });
         return
       }
-      User.findOne({
+      console.log(data)
+      if (data[0]) {
+        responseSend(res, 200, {
+          status: 200,
+          message: "OTP verified Successfully"
+        })
+        Otp.deleteOne({
+          mobileNo: req.body.mobileNo
+        }, (err, user) => {
+          if (err)
+            console.log("Errr", err)
+          else if (data[0])
+            console.log(data[0]._id, "User Deleted")
+        });
+        return;
+      } else {
+        responseSend(res, 422, {
+          status: 422,
+          message: "OTP Not Valid"
+        })
+
+      }
+    })
+  } catch (err) {
+    responseSend(res, 500, {
+      status: 500,
+      message: "Oops Something went wrong!"
+    });
+  }
+
+})
+/*** forgot Password ***/
+user.post('/forgotPassword', async (req, res) => {
+  try {
+    let error = await getUserDetails('mobileNo', req.body.mobileNo);
+    if (!error)
+      responseSend(res, 401, {
+        status: 401,
+        message: 'Mobile Number Not Found'
+      })
+    else
+      User.updateOne({
         mobileNo: req.body.mobileNo
-      }, async (err, data) => {
-        if (err) {
-          responseSend(res, 500, {
-            status: 500,
-            message: "Oops Something Went Wrong!"
+      }, {
+        $set: req.body
+      }, async (err, user) => {
+        if (err || !user || user === undefined) {
+          responseSend(res, 304, {
+            status: 304,
+            message: 'not updated'
           });
           return
         }
-        let userData = {
-          message: 'Successfully Updated',
-          status: 200,
-          userId: data.userId,
-          mobileNo: data.mobileNo,
-          name: data.name,
-          imgPath: data.imgPath.file_name ? data.imgPath : '',
-        };
-        responseSend(res, 200, userData)
+        User.findOne({
+          mobileNo: req.body.mobileNo
+        }, async (err, data) => {
+          if (err) {
+            responseSend(res, 500, {
+              status: 500,
+              message: "Oops Something Went Wrong!"
+            });
+            return
+          }
+          let userData = {
+            message: 'Successfully Updated',
+            status: 200,
+            userId: data.userId,
+            mobileNo: data.mobileNo,
+            name: data.name,
+            imgPath: data.imgPath.file_name ? data.imgPath : '',
+          };
+          responseSend(res, 200, userData)
+        })
       })
-    })
+  } catch (err) {
+    responseSend(res, 500, {
+      status: 500,
+      message: "Oops Something went wrong!"
+    });
+  }
 })
 /*** Uploading Img***/
 user.post('/profileimage', (req, res) => {
   //  Your code goes here
-})
-user.get('/getOtp', async (req, res) => {
-  let data = await Otp.find({}).sort({
-    _id: -1
-  });
-  responseSend(res, 200, {
-    status: 200,
-    message: data
-  })
-})
+});
+
+
 
 //////////////////////////////General Functions starts from here //////////////////////////////
 
@@ -327,11 +326,11 @@ getId = async () => {
       "u1"
   // return val["userId"] != null || val != NaN ?
   //   "u" + (parseInt(val["userId"]).split("u")[1] + 1) : "u1";
-  else
-    {
-  console.log("Got called")
+  else {
+    console.log("Got called")
 
-      return "u1";}
+    return "u1";
+  }
 }
 /*** Getting All UserDetails***/
 getAll = async () => {
@@ -351,24 +350,27 @@ getUserDetails = async (para, val) => {
 
 /*** Getting All RandomOTP***/
 getRandomOtp = async (res, mobileNo) => {
-  let userOtp = new Otp({
-    mobileNo: mobileNo,
-    otp: await generateOTP(),
-    type: 'user'
-  })
-  userOtp.save(function (error, user) {
-    if (error) {
-      responseSend(res, 500, {
-        status: 500,
-        message: error
-      })
-      return
-    }
-    responseSend(res, 200, {
-      status: 200,
-      message: user.otp
+  try {
+    let userOtp = new Otp({
+      mobileNo: mobileNo,
+      otp: await generateOTP(),
+      type: 'user'
     })
-  });
+    userOtp.save(function (error, user) {
+      if (user) responseSend(res, 200, {
+        status: 200,
+        message: user.otp
+      })
+      if (!user)
+        throw error
+    });
+  } catch (err) {
+    responseSend(res, 500, {
+      status: 500,
+      message: error
+    })
+  }
+
 }
 /*** OTP generation***/
 generateOTP = () => {
@@ -396,4 +398,33 @@ function responseSend(res, statusCode, message) {
   res.status(statusCode)
     .send(message);
 }
+
+
+
+
+
+
+/////test purpose
+user.get('/getOtp', async (req, res) => {
+  try {
+    let data = await Otp.find({}).sort({
+      _id: -1
+    });
+    responseSend(res, 200, {
+      status: 200,
+      message: data
+    })
+  } catch (err) {
+    responseSend(res, 500, {
+      status: 500,
+      message: "Oops Something went wrong!"
+    });
+  }
+})
+
+
+
+
+
+
 module.exports = user;
