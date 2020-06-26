@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 const vendorListSchema = new mongoose.Schema({
-    id:{
-        type:String,
-        require:true,
-        trim:true
+    listId: {
+        type: String,
+        require: true,
+        trim: true
     },
     name: {
         type: String,
@@ -16,6 +16,10 @@ const vendorListSchema = new mongoose.Schema({
         type: String,
         require: true
     },
+    createdDate: {
+        type: String,
+        default: new Date()
+    },
     description: {
         type: String,
         require: true,
@@ -23,7 +27,7 @@ const vendorListSchema = new mongoose.Schema({
 
     },
     price: {
-        type: String,
+        type: Number,
         require: true
     },
     vendorId: {
@@ -142,20 +146,23 @@ const vendorListSchema = new mongoose.Schema({
             type: String,
             default: null
         },
-        message:{
-            type:String,
-            default:null
+        message: {
+            type: String,
+            default: null
         },
-        createdDate:{
-            type:String, default:new Date()
+        createdDate: {
+            type: String,
+            default: new Date()
         }
     },
-    review:{
-        noOfReview:{
-            type:Number,default:0
+    review: {
+        noOfReview: {
+            type: Number,
+            default: 0
         },
-        Avgrating:{
-            type:Number,default:0
+        avgRating: {
+            type: Number,
+            default: 0
         }
     }
 

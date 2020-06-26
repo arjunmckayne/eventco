@@ -58,10 +58,20 @@ const userSchema = new mongoose.Schema({
 
     },
     location: {
-        type: String,
-        require: true,
-        max: 25,
-        min: 5
+        longitude: {
+            type: String,
+            require: true,
+        },
+        latitude: {
+            type: String,
+            require: true,
+        },
+        city: {
+            type: String,
+            require: true,
+            max: 25,
+            min: 5
+        }
     }
 });
 

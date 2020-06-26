@@ -5,9 +5,10 @@ const multipart = require('connect-multiparty');
 const upload = multipart({
     uploadDir: './public/img/vendor/vendorList'
 });
-vVendorList.post('/reg', upload, async (req, res) => {
-    try{
+vVendorList.post('/insert', upload, async (req, res) => {
+    try {
         let vendorData = new vendorModel({
+            listId: await getId(),
             name: req.body.name,
             img: req.files.img.path,
             description: req.body.description,
@@ -22,9 +23,9 @@ vVendorList.post('/reg', upload, async (req, res) => {
                 "location.country": req.body.country
             },
             portfolio: {
-                location: null,
-                video: null,
-                image: null
+                location: req.body.location,
+                video: (req.files.portfolioVideo.path) ? req.files.portfolioVideo.path : null,
+                image: (req.files.portfolioImg.path) ? req.files.portfolioImg.path : null
             },
             rating: {
                 userId: null,
@@ -37,7 +38,7 @@ vVendorList.post('/reg', upload, async (req, res) => {
                 promotionId: null
             },
             documents: {
-                path: req.files.documents.path
+                path: (req.files.documents.path) ? req.files.documents.path : null
             },
             message: {
                 userId: null,
@@ -56,18 +57,34 @@ vVendorList.post('/reg', upload, async (req, res) => {
             responseSend(res, 200, "Successfully Uploaded the VendorList");
             console.log(data)
         })
-    }
-    catch(err){
-console.log(err);
-res.json(err.message)
+    } catch (err) {
+        console.log(err);
+        res.status(500)
+            .json(err.message)
     }
     if (!req.body.name || req.body.name === '' || !req.files) {
         responseSend(res, 401, 'Pass the data');
         console.log(req.files)
         return
     }
-    
+
 })
+
+
+
+getId = async () => {
+    const val = await vendorModel.findOne({}).sort({
+        createdDate: -1
+    });
+
+    if (val) {
+        console.log("----- ",val.listId)
+        return (val.listId != null || val.listId != NaN || val.listId != undefined) ?
+            "l" + (parseInt(val.listId.split("l")[1]) + 1) :
+            "l1"
+    }
+    return "l1"
+}
 
 
 

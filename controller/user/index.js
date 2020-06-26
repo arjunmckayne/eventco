@@ -82,10 +82,10 @@ user.post('/register', async (req, res) => {
       return
     }
     let user = new User({
-      userId: await getId(),
+      userId: await getuserId(),
       name: req.body.name,
       password: req.body.password,
-      mobileNo: req.body.mobileNo,
+      mobileNo: req.body.mobileNxo,
       email: req.body.email,
       createdDate: new Date()
     });
@@ -213,6 +213,7 @@ user.post('/otpForgot', async (req, res) => {
 });
 user.post('/verifyOtp', async (req, res) => {
   try {
+    console.log(req.body);
     Otp.find({
       mobileNo: req.body.mobileNo,
       otp: req.body.otp,
@@ -316,10 +317,10 @@ user.post('/profileimage', (req, res) => {
 //////////////////////////////General Functions starts from here //////////////////////////////
 
 /*** Getting UserId***/
-getId = async () => {
+getuserId = async () => {
   const val = await User.findOne({}).sort({
     createdDate: -1
-  }).limit(1);
+  });
   if (val)
     return val.userId != null || val.userId != NaN ?
       "u" + (parseInt(val.userId.split("u")[1]) + 1) :
@@ -357,10 +358,13 @@ getRandomOtp = async (res, mobileNo) => {
       type: 'user'
     })
     userOtp.save(function (error, user) {
-      if (user) responseSend(res, 200, {
-        status: 200,
-        message: user.otp
-      })
+      if (user)
+      {  responseSend(res, 200, {
+          status: 200,
+          message: user.otp
+        })
+      console.log(userOtp)
+      }
       if (!user)
         throw error
     });

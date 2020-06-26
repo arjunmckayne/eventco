@@ -3,10 +3,13 @@ const bcrypt = require("bcryptjs");
 const validator = require("validator");
 const otpSchema = new mongoose.Schema({
     mobileNo: {
-        type: Number, require: true
+        type: Number, required: true
     },
     otp:{
-        type: Number, require: true
+        type: Number, required: true
+    },
+    type: {
+        type:String,required:true
     }
 })
 otpSchema.pre('save', async function (next) {
