@@ -7,6 +7,7 @@ const Otp = require('../commonModels/otpModel');
 //user redirections////
 user.use('/slider', require('./slider'));
 user.use('/vendorList', require('./vendorList'));
+user.use('/event', require('./event'));
 
 /*** User Data***/
 user.get('/', async function (req, res) {

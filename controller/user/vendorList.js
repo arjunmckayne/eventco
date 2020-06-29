@@ -9,7 +9,10 @@ vendorList.get('/home', async (req, res) => {
             "promotions.isPromotion": true
         }, (err, data) => {
             if (err)
-                throw err
+            throw {
+                code: 500,
+                msg: "Oops Something went wrong"
+            }
             else {
                 if (data.length <= 0)
                     responseSend(
@@ -37,15 +40,17 @@ vendorList.get('/home', async (req, res) => {
             }
         });
     } catch (err) {
-        responseSend(res, 500, {
-            status: 500,
-            message: err.message
-        });
+        responseSend(
+            res, err.code, {
+                status: err.code,
+                message: err.msg
+            });
     }
 });
 
 vendorList.post('/search', async (req, res) => {
     try {
+        
         if (req.body.userId === null || req.body.userId === "" || req.body.userId === undefined || req.body.categoryType === null || req.body.categoryType === undefined || req.body.categoryType === '')
             throw error
         userModel.findOne({
@@ -60,7 +65,7 @@ vendorList.post('/search', async (req, res) => {
                         categoryType: req.body.categoryType
                     }, async (outerErr, innerdata) => {
                         if (outerErr)
-                            throw outerErr
+                           { throw outerErr}
                         if (innerdata.length <= 0)
                             responseSend(res, 404, {
                                 status: 404,
@@ -76,7 +81,8 @@ vendorList.post('/search', async (req, res) => {
                                     price: val.price ? val.price : '',
                                     avgRating: (val.avgRating) ? val.avgRating : '',
                                     reviewCount: (val.noOfReview) ? val.noOfReview : "",
-                                    categoryTypeId: val.categoryTypeId
+                                    categoryType: val.categoryType,
+                                    img:(val.img)?val.img:''
                                 }
                             })
                             let output = {
@@ -93,7 +99,7 @@ vendorList.post('/search', async (req, res) => {
                         categoryType: req.body.categoryType
                     }, async (innerErr, vendorList) => {
                         if (innerErr)
-                            throw innerErr
+                            {throw innerErr}
                         if (vendorList.length <= 0) {
                             responseSend(res, 404, {
                                 status: 404,
@@ -109,7 +115,8 @@ vendorList.post('/search', async (req, res) => {
                                     price: val.price ? val.price : '',
                                     avgRating: (val.avgRating) ? val.avgRating : 0,
                                     reviewCount: (val.noOfReview) ? val.noOfReview : 0,
-                                    categoryTypeId: val.categoryTypeId
+                                    categoryType: val.categoryType,
+                                    img:(val.img)?val.img:''
                                 }
                                 valArray.push(dum)
                             });
@@ -135,7 +142,8 @@ vendorList.post('/search', async (req, res) => {
                                     price: val.price ? val.price : '',
                                     avgRating: (val.avgRating) ? val.avgRating : 0,
                                     reviewCount: (val.noOfReview) ? val.noOfReview : 0,
-                                    categoryTypeId: val.categoryTypeId
+                                    categoryType: val.categoryType,
+                                    img:(val.img)?val.img:''
                                 }
                                 valArray.push(dum)
                             });

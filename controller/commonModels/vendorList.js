@@ -123,11 +123,13 @@ const vendorListSchema = new mongoose.Schema({
     },
     promotions: {
         isPromotion: {
-            type: Boolean
+            type: Boolean,
+            default:false
         },
         promotionId: {
             type: String,
-            trim: true
+            trim: true,
+            default:null
         }
     },
     documents: {

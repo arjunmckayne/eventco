@@ -24,30 +24,12 @@ vVendorList.post('/insert', upload, async (req, res) => {
             },
             portfolio: {
                 location: req.body.location,
-                video: (req.files.portfolioVideo.path) ? req.files.portfolioVideo.path : null,
-                image: (req.files.portfolioImg.path) ? req.files.portfolioImg.path : null
-            },
-            rating: {
-                userId: null,
-                message: null,
-                score: null
-            },
-            amenities: null,
-            promotions: {
-                isPromotion: null,
-                promotionId: null
+                video: (req.files.portfolioVideo) ? req.files.portfolioVideo.path : null,
+                image: (req.files.portfolioImg) ? req.files.portfolioImg.path : null
             },
             documents: {
                 path: (req.files.documents.path) ? req.files.documents.path : null
             },
-            message: {
-                userId: null,
-                message: null,
-            },
-            review: {
-                noOfReview: null,
-                Avgrating: null
-            }
         });
         vendorData.save((error, data) => {
             if (error) {
@@ -58,9 +40,11 @@ vVendorList.post('/insert', upload, async (req, res) => {
             console.log(data)
         })
     } catch (err) {
-        console.log(err);
-        res.status(500)
-            .json(err.message)
+        responseSend(
+            res, 500, {
+                status: 200,
+                message: err.message
+            });
     }
     if (!req.body.name || req.body.name === '' || !req.files) {
         responseSend(res, 401, 'Pass the data');

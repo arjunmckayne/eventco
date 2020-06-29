@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
-const vendorListSchema = new mongoose.Schema({
-
+const eventListSchema = new mongoose.Schema({
     eId: {
         type: String,
         required: true,
@@ -12,6 +11,16 @@ const vendorListSchema = new mongoose.Schema({
         max: 25,
         min: 5,
         trim: true
+    },
+    video: {
+        path: {
+            type: String,
+            default: null
+        },
+        isFeatured: {
+            type: Boolean,
+            default: false
+        }
     },
     img: {
         type: String,
@@ -31,34 +40,29 @@ const vendorListSchema = new mongoose.Schema({
         type: String,
         default: null
     },
-    userId: {
+    createdBy: {
         type: String,
         required: true
     },
     location: {
         longitude: {
             type: String,
-            required: true,
             default: null
 
         },
         latitude: {
             type: String,
-            required: true,
             default: null
         },
         city: {
             type: String,
-            required: true,
             default: null
         }
     },
     share: {
         shareId: {
             type: String,
-            required: true,
             trim: true,
-            default: 'sh1'
         },
         type: {
             type: String,
@@ -70,72 +74,90 @@ const vendorListSchema = new mongoose.Schema({
     vendorData: {
         vendorId: {
             type: String,
-            default: null
         },
         listId: {
             type: String,
-            default: null
         },
         vendorName: {
             type: String,
-            default: null
         },
         cost: {
             type: Number,
-            default: 0
+            default: null
         },
         updatedBy: {
             type: String,
-            default: null
         },
         status: {
             statusId: {
                 type: String,
-                default: null
             },
             img: {
                 type: String,
-                default: null
             },
             createdTime: {
                 type: String,
-                default: new Date()
+
             }
         },
     },
     quoteList: {
         qId: {
             type: String,
-            default: null
         },
         vendorId: {
             type: String,
-            default: null
         },
         quotedAmount: {
             type: Number,
-            default: 0
         },
         status: {
             type: String,
-            default: null
         },
         createdDate: {
             type: String,
-            default: new Date()
         },
         amountbyVendor: {
             type: Number,
-            default: 0
         }
     },
-    description:{
-        type:String, default:null
+    description: {
+        type: {
+            type: String,
+
+        },
+        subCat: {
+            type: String,
+        },
+        amount: {
+            type: Number,
+        },
+        eventDate: {
+            type: String,
+            default: null
+        },
+        eventTime: {
+            type: String,
+            default: null,
+        },
+        endDate: {
+            type: String,
+            default: null
+        },
+        endTime: {
+            type: String,
+            default: null
+        }
+    },
+    boosted: {
+        type: Boolean,
+        default: false
     }
+
 
 });
 
 
 
-let event = mongoose.model('event', vendorListSchema);
+let event = mongoose.model('event', eventListSchema);
 module.exports = event;
