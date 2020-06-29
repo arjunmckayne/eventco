@@ -302,8 +302,6 @@ event.get('/feature', async (req, res) => {
             });
     }
 })
-
-
 getCrntDate = async () => {
     let date = (new Date().getDate()).toString() + "/" + (new Date().getMonth() < 10 ? '0' + new Date().getMonth() : new Date().getMonth()).toString() + "/" + (new Date().getFullYear()).toString();
     return date
