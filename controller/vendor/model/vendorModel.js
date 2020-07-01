@@ -1,34 +1,39 @@
 const mongoose = require('mongoose');
+const bcrypt = require("bcryptjs");
 const validator = require("validator");
+const beautifyUnique = require('mongoose-beautiful-unique-validation');
 const vendorSchema = new mongoose.Schema({
-    vendorId:{
+    vendorId: {
         type: String,
-        require: true,
-        default: 'v1',
+        required: true,
+        default: null,
     },
     name: {
         type: String,
-        require: true,
+        required: true,
         max: 25,
+        trim: true,
         min: 5
     },
     password: {
         type: String,
-        require: true
+        required: true
     },
     email: {
         type: String,
-        require: true,
+        required: true,
         lowercase: true,
+        trim: true,
         unique: 'Already email exists',
         validate: value => {
             if (!validator.isEmail(value))
                 return 'Invalid Email'
         }
     },
-    mobile: {
+    mobileNo: {
         type: Number,
         require: true,
+        trim: true,
         unique: 'Already mobileNo exists',
         validate: {
             validator: Number.isInteger,
@@ -37,24 +42,32 @@ const vendorSchema = new mongoose.Schema({
     },
     profileImg: {
         type: String,
-        require: true,
     },
     isVerified: {
         type: Boolean,
-        require: true
+        required: true,
+        default: false
     },
     status: {
         type: String,
-        require: true
+        trim: true,
     },
     location: {
         city: {
             type: String,
             require: true,
         },
+        longitude: {
+            type: String,
+            default: null
+        },
+        latitude: {
+            type: String,
+            default: null
+        },
         district: {
             type: String,
-            require: true,
+            default: null
         }
     },
     messages: {
@@ -80,15 +93,40 @@ const vendorSchema = new mongoose.Schema({
         }
     },
     document: {
-        IdProof: {
+        idProof: {
             type: String,
-            require: true,
         },
         licenceDoc: {
             type: String,
-            require: true
         }
+    },
+    createdDate: {
+        type: String,
+        default: new Date()
+    },
+    updatedDate: {
+        type: String,
+        default: new Date()
     }
+});
+
+vendorSchema.pre('save', async function (next) {
+    const vendor = this
+    if (vendor.isModified('password'))
+        vendor.password = await bcrypt.hash(vendor.password, 8)
+    next()
+});
+vendorSchema.methods.comparePassword = function (password, callback) {
+    bcrypt.compare(password, this.password, function (error, isMatch) {
+        if (error)
+            return callback(error);
+        callback(null, isMatch);
+    });
+};
+
+vendorSchema.plugin(beautifyUnique);
+vendorSchema.plugin(beautifyUnique, {
+    defaultMessage: "Unique Style"
 });
 let Vendor = mongoose.model('vendor', vendorSchema);
 module.exports = Vendor;

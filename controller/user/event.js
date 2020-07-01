@@ -183,7 +183,6 @@ event.get('/trending', async (req, res) => {
                                 eventId: dum.eId,
                                 eventName: dum.name,
                                 imgPath: (dum.img) ? dum.img : '',
-                                city: (dum.location.city) ? dum.location.city : 'NA',
                             }
                             dataArray.push(temp);
                         });
@@ -238,7 +237,7 @@ event.get('/real', async (req, res) => {
                         });
                         responseSend(
                             res, 200, {
-                                trendingData: dataArray
+                                realData: dataArray
                             })
                     }
                 }
@@ -301,7 +300,12 @@ event.get('/feature', async (req, res) => {
                 message: err.msg
             });
     }
+});
+
+event.put('/updateImg', async (req,res)=>{
+    
 })
+
 getCrntDate = async () => {
     let date = (new Date().getDate()).toString() + "/" + (new Date().getMonth() < 10 ? '0' + new Date().getMonth() : new Date().getMonth()).toString() + "/" + (new Date().getFullYear()).toString();
     return date

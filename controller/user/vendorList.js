@@ -9,10 +9,10 @@ vendorList.get('/home', async (req, res) => {
             "promotions.isPromotion": true
         }, (err, data) => {
             if (err)
-            throw {
-                code: 500,
-                msg: "Oops Something went wrong"
-            }
+                throw {
+                    code: 500,
+                    msg: "Oops Something went wrong"
+                }
             else {
                 if (data.length <= 0)
                     responseSend(
@@ -47,10 +47,8 @@ vendorList.get('/home', async (req, res) => {
             });
     }
 });
-
 vendorList.post('/search', async (req, res) => {
     try {
-        
         if (req.body.userId === null || req.body.userId === "" || req.body.userId === undefined || req.body.categoryType === null || req.body.categoryType === undefined || req.body.categoryType === '')
             throw error
         userModel.findOne({
@@ -64,8 +62,9 @@ vendorList.post('/search', async (req, res) => {
                         "contact.location.city": outerData.location.city,
                         categoryType: req.body.categoryType
                     }, async (outerErr, innerdata) => {
-                        if (outerErr)
-                           { throw outerErr}
+                        if (outerErr) {
+                            throw outerErr
+                        }
                         if (innerdata.length <= 0)
                             responseSend(res, 404, {
                                 status: 404,
@@ -79,11 +78,12 @@ vendorList.post('/search', async (req, res) => {
                                     name: val.name,
                                     city: (val.contact.location.city) ? val.contact.location.city : '',
                                     price: val.price ? val.price : '',
-                                    avgRating: (val.avgRating) ? val.avgRating : '',
-                                    reviewCount: (val.noOfReview) ? val.noOfReview : "",
+                                    avgRating: (val.review.avgRating) ? val.review.avgRating : 0,
+                                    reviewCount: (val.review.noOfReview) ? val.review.noOfReview : 0,
                                     categoryType: val.categoryType,
-                                    img:(val.img)?val.img:''
+                                    img: (val.img) ? val.img : ''
                                 }
+                                valArray.push(dum);
                             })
                             let output = {
                                 count: innerdata.length,
@@ -99,7 +99,8 @@ vendorList.post('/search', async (req, res) => {
                         categoryType: req.body.categoryType
                     }, async (innerErr, vendorList) => {
                         if (innerErr)
-                            {throw innerErr}
+                            throw new Error(innerErr)
+
                         if (vendorList.length <= 0) {
                             responseSend(res, 404, {
                                 status: 404,
@@ -113,10 +114,10 @@ vendorList.post('/search', async (req, res) => {
                                     name: val.name,
                                     city: (val.contact.location.city) ? val.contact.location.city : '',
                                     price: val.price ? val.price : '',
-                                    avgRating: (val.avgRating) ? val.avgRating : 0,
-                                    reviewCount: (val.noOfReview) ? val.noOfReview : 0,
+                                    avgRating: (val.review.avgRating) ? val.review.avgRating : 0,
+                                    reviewCount: (val.review.noOfReview) ? val.review.noOfReview : 0,
                                     categoryType: val.categoryType,
-                                    img:(val.img)?val.img:''
+                                    img: (val.img) ? val.img : ''
                                 }
                                 valArray.push(dum)
                             });
@@ -131,7 +132,7 @@ vendorList.post('/search', async (req, res) => {
                         categoryType: req.body.categoryType
                     }, async (innerErr, vendorList) => {
                         if (innerErr)
-                            throw innerErr
+                            throw new Error(innerErr)
                         if (vendorList.length > 0) {
                             let valArray = [];
                             vendorList.forEach((val) => {
@@ -140,10 +141,10 @@ vendorList.post('/search', async (req, res) => {
                                     name: val.name,
                                     city: (val.contact.location.city) ? val.contact.location.city : '',
                                     price: val.price ? val.price : '',
-                                    avgRating: (val.avgRating) ? val.avgRating : 0,
-                                    reviewCount: (val.noOfReview) ? val.noOfReview : 0,
+                                    avgRating: (val.review.avgRating) ? val.review.avgRating : 0,
+                                    reviewCount: (val.review.noOfReview) ? val.review.noOfReview : 0,
                                     categoryType: val.categoryType,
-                                    img:(val.img)?val.img:''
+                                    img: (val.img) ? val.img : ''
                                 }
                                 valArray.push(dum)
                             });

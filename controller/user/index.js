@@ -3,7 +3,20 @@ const user = new express.Router();
 var validator = require("email-validator");
 const User = require('./model/userModel')
 const Otp = require('../commonModels/otpModel');
+const multer = require('multer');
+const storage = multer.diskStorage({
+  destination: (req, file, callBack) => {
+    callBack(null, 'public/img/vendor/vendorProfile')
+  },
+  filename: (req, file, callBack) => {
+    console.log(req.body)
+    callBack(null, `VendorProfile${file.originalname}`)
+  }
+})
 
+const upload = multer({
+  storage: storage
+})
 //user redirections////
 user.use('/slider', require('./slider'));
 user.use('/vendorList', require('./vendorList'));
@@ -90,8 +103,6 @@ user.post('/register', async (req, res) => {
       email: req.body.email,
       createdDate: new Date()
     });
-
-
     user.save(function (error, user) {
       if (error) {
         let errorMsg = '';
@@ -193,8 +204,6 @@ user.post('/otpForgot', async (req, res) => {
         message: 'Mobile Number Not Exists'
       });
     else {
-
-
       Otp.deleteOne({
         mobileNo: req.body.mobileNo
       }, (err, user) => {
@@ -214,7 +223,6 @@ user.post('/otpForgot', async (req, res) => {
 });
 user.post('/verifyOtp', async (req, res) => {
   try {
-    console.log(req.body);
     Otp.find({
       mobileNo: req.body.mobileNo,
       otp: req.body.otp,
@@ -309,8 +317,42 @@ user.post('/forgotPassword', async (req, res) => {
   }
 })
 /*** Uploading Img***/
-user.post('/profileimage', (req, res) => {
-  //  Your code goes here
+user.put('/profileImg', upload.single('profileImg'), async (req, res) => {
+  try {
+    if (!req.file)
+      throw {
+        code: 400,
+        msg: "Please Upload Picture"
+      }
+    if (!req.body || !req.body.userId || req.body.userId === '' || req.body.userId[0] != 'v' || !req.file.path)
+      throw {
+        code: 400,
+        msg: "Please Upload the data"
+      };
+    User.updateOne({
+      userId: req.body.userId
+    }, {
+      $set: {
+        "imgPath": req.file.path,
+        updatedDate: new Date()
+      }
+    }, (err, succ) => {
+      console.log(succ, ":::::")
+      err || succ.n<=0 || succ === undefined  ?
+        responseSend(res, 302,
+          "Updation failure"
+        ) :
+        responseSend(res, 200,
+          "Updated Successfully ",
+        );
+    })
+  } catch (err) {
+    responseSend(
+      res, err.code ? err.code : 500, {
+        status: err.code ? err.code : 500,
+        message: err.msg ? err.msg : "Oops Something went wrong"
+      });
+  }
 });
 
 
@@ -359,12 +401,12 @@ getRandomOtp = async (res, mobileNo) => {
       type: 'user'
     })
     userOtp.save(function (error, user) {
-      if (user)
-      {  responseSend(res, 200, {
+      if (user) {
+        responseSend(res, 200, {
           status: 200,
           message: user.otp
         })
-      console.log(userOtp)
+        console.log(userOtp)
       }
       if (!user)
         throw error
@@ -375,7 +417,6 @@ getRandomOtp = async (res, mobileNo) => {
       message: error
     })
   }
-
 }
 /*** OTP generation***/
 generateOTP = () => {

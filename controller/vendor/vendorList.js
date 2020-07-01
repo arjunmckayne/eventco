@@ -1,11 +1,11 @@
 const express = require('express');
-const vVendorList = new express.Router();
+const listRouter = new express.Router();
 const vendorModel = require('./../commonModels/vendorList');
 const multipart = require('connect-multiparty');
 const upload = multipart({
     uploadDir: './public/img/vendor/vendorList'
 });
-vVendorList.post('/insert', upload, async (req, res) => {
+listRouter.post('/insert', upload, async (req, res) => {
     try {
         let vendorData = new vendorModel({
             listId: await getId(),
@@ -51,7 +51,6 @@ vVendorList.post('/insert', upload, async (req, res) => {
         console.log(req.files)
         return
     }
-
 })
 
 
@@ -62,7 +61,7 @@ getId = async () => {
     });
 
     if (val) {
-        console.log("----- ",val.listId)
+        console.log("----- ", val.listId)
         return (val.listId != null || val.listId != NaN || val.listId != undefined) ?
             "l" + (parseInt(val.listId.split("l")[1]) + 1) :
             "l1"
@@ -77,4 +76,4 @@ function responseSend(res, statusCode, message) {
     res.status(statusCode)
         .send(message);
 }
-module.exports = vVendorList;
+module.exports = listRouter;

@@ -7,6 +7,7 @@
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
     "connect-multiparty": "^2.2.0",
+    "cors": "^2.8.5",
     "email-validator": "^2.0.4",
     "express": "^4.17.1",
     "helmet": "^3.23.1",
@@ -19,7 +20,7 @@
   "devDependencies": {},
   "scripts": {
     "start": "node index.js",
-    "devStart":"nodemon index.js"
+    "devStart": "nodemon index.js"
   },
   "repository": {
     "type": "git",
